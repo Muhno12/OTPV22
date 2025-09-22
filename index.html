@@ -79,39 +79,6 @@
 <body>
 <div class="toast" id="toastMsg">Access token berhasil disalin!</div>
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login OTPV2</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #fafafa;
-        }
-        .login-container {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .login-text {
-            font-size: 28px;
-            font-weight: bold;
-            color: #444;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <div class="login-text">LOGIN OTPV2
 <div class="card">
   <div class="form">
     <label>Nomor HP</label>
@@ -188,41 +155,6 @@ function loginOTP() {
         document.getElementById("accessBox").textContent = "🔑 Access Token:\n" + data.data.access_token;
         document.getElementById("accessBox").style.display = "block";
       } else {
-        tampilkanHasil("❌ " + (data.message || "Login OTP gagal"));
-      }
-    })
-    .catch(err => tampilkanHasil("❌ Error: " + err.toString()));
-}
-
-function salinToken() {
-  const token = localStorage.getItem("access_token");
-  if (!token) return alert("Access token belum tersedia.");
-
-  navigator.clipboard.writeText(token).then(() => {
-    const toast = document.getElementById("toastMsg");
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 3000);
-  }).catch(() => {
-    alert("❌ Gagal menyalin token.");
-  });
-}
-// Tampilkan access token saat halaman dibuka jika tersedia
-window.addEventListener("DOMContentLoaded", () => {
-  const token = localStorage.getItem("access_token");
-  const box = document.getElementById("accessBox");
-
-  if (token) {
-    box.textContent = token;
-    box.style.display = "block";
-  } else {
-    box.textContent = "Belum ada access token";
-    box.style.display = "block";
-  }
-});
-
-</script>
-</body>
-</html>
         tampilkanHasil("❌ " + (data.message || "Login OTP gagal"));
       }
     })
