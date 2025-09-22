@@ -1,325 +1,192 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Login OTPV2 Circelcuanmv</title>
-    <link href="css/tailwind.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <script src="js/jquery.min.js"></script>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOGIN OTP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+      margin: 0; padding: 0;
+      background: url("https://api3.duniadigitalsb.my.id/muhni/dor/backend.php?action=produk") no-repeat center center fixed;
+      background-size: cover; min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      padding: 20px;
+    }
+    .card {
+      background: white; border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%; max-width: 420px;
+      overflow: hidden; animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .form { padding: 20px; }
+    label { font-size: 0.9rem; margin-top: 10px; display: block; }
+    input[type="tel"] {
+      width: 100%; padding: 12px; font-size: 1rem; margin-top: 6px;
+      border: 1px solid #ccc; border-radius: 10px; background: #f9f9f9;
+      outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus {
+      border-color: #1565c0; box-shadow: 0 0 0 3px #1565c033;
+    }
+    button {
+      width: 100%; padding: 14px; margin-top: 16px; font-weight: 600;
+      font-size: 1rem; background: #1565c0; color: white;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover { background: #003f8a; }
+    .result {
+      margin: 0 20px 12px; padding: 14px;
+      background: #fafafa; border: 1px solid #ddd;
+      border-radius: 10px; font-size: 0.85rem; white-space: pre-wrap;
+    }
+    .spinner {
+      width: 30px; height: 30px; border: 4px solid #ddd;
+      border-top: 4px solid #1565c0; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 14px auto; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .info {
+      background: #f0f8ff; padding: 10px; border-left: 4px solid #1565c0;
+      font-size: 0.85rem; margin: 10px 0; border-radius: 6px;
+    }
+    .access-token {
+      background: #e8f5e9; color: red; margin: 0 20px 10px;
+      padding: 8px 12px; border-radius: 6px; font-size: 0.85rem;
+      word-break: break-all;
+    }
+    .toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #4caf50; color: white; padding: 10px 18px;
+      border-radius: 6px; font-size: 0.9rem; z-index: 9999;
+      display: none; animation: fadeInOut 3s ease forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-10px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
+<div class="toast" id="toastMsg">Access token berhasil disalin!</div>
 
-    <style>
-    #cover-spin {
-        position:fixed;
-        width:100%;
-        left:0;right:0;top:0;bottom:0;
-        background-color: rgba(255,255,255,0.7);
-        z-index:9999;
-        display:none;
-    }
+<div class="card">
+  <div class="form">
+    <label>Nomor HP</label>
+    <input type="tel" id="nomorOtp" placeholder="628xxx">
+    <div class="info">
+      Masukkan nomor XL/AXIS lalu klik <b>Minta OTP</b> untuk verifikasi.
+    </div>
+    <button onclick="mintaOTP()">Minta OTP</button>
 
-    @-webkit-keyframes spin {
-        from {-webkit-transform:rotate(0deg);}
-        to {-webkit-transform:rotate(360deg);}
-    }
+    <label>Kode OTP</label>
+    <input type="tel" id="kode_otp" placeholder="123456">
+    <button onclick="loginOTP()">Login OTP</button>
+  </div>
 
-    @keyframes spin {
-        from {transform:rotate(0deg);}
-        to {transform:rotate(360deg);}
-    }
-
-    #cover-spin::after {
-        content:'';
-        display:block;
-        position:absolute;
-        left:48%;top:40%;
-        width:40px;height:40px;
-        border-style:solid;
-        border-color:black;
-        border-top-color:#1976D2;
-        border-width: 4px;
-        border-radius:50%;
-        -webkit-animation: spin .8s linear infinite;
-        animation: spin .8s linear infinite;
-    }
-    </style>
-
-    <div id="cover-spin"></div>
-
-    <!-- Headernya -->
-    <header class="bg-white shadow">
-        <div class="container mx-auto px-4 py-6">
-            <h1 class="text-3xl font-bold">OTPV2 Circelcuanmv</h1>
-            <!--<p class="text-xl text-gray-600">Solusi Mudah Login XL Tanpa Antre OTP ke Seller</p>-->
-        </div>
-    </header>
-
-    <!-- Infonya -->
-    <section id="about" class="container mx-auto px-4 py-10">
-        <h2 class="text-2xl font-bold mb-4">Silahkan Login OTP Sebelum Melakukan Transaksi!</h2>
-        <!--<p class="text-lg text-gray-700">Sesi login kamu/pelanggan kamu akan muncul di metode login: <b>Login dengan Akses Sebelumnya</b></p>
-        <!--<p class="text-lg text-gray-700">Setelah meninggalkan Login nomor XL kamu, seller akan memproses paket sesuai yang kamu beli!<br>-->
-        <!--<b>Cara:</b><br>
-        <ol>
-            <li>Inputkan kode seller dan nomor XL kamu ke kolom isian Msisdn/Nomor XL.</li>
-            <li>Klik tombol Minta Kode OTP</li>
-            <li>Periksa kode OTP yang masuk di SMS nomor XL kamu, lalu masukkan ke kolom isian Kode OTP dan klik LOGIN OTP.</li>
-            <li>Konfirmasi ke seller agar permintaan paket Anda diproses!</li>
-        </ol>-->
-        <p></p>
-    </section>
-
-    <!-- Ini Formnya -->
-    <section id="contact" class="container mx-auto px-4 py-10" style="margin-top: -40px;">
-        <h2 class="text-2xl font-bold mb-4">LOGIN OTP</h2>
-        <form action="" method="POST">
-            <div class="mb-4" style="display: none;">
-                <label for="seller_code" class="block text-lg font-medium text-gray-700">Kode Seller (jika tidak tahu, tanyakan ke seller Anda)</label>
-                <input type="text" id="seller_code" name="seller_code" class="mt-1 p-2 border border-gray-300 rounded-md w-full" placeholder="Contoh: BosamStoreKizaOpaOpa" value="Muhnoo" required=""><br>
-                </div>            <div class="mb-4">
-                <label for="msisdn" class="block text-lg font-medium text-gray-700">Msisdn/Nomor XL</label>
-                <input type="number" id="msisdn" name="msisdn" class="mt-1 p-2 border border-gray-300 rounded-md w-full" placeholder="Contoh: 628xxx/08xxx" value="" required=""><br>
-            </div>
-            <div class="mb-4">
-                <label for="otp" class="block text-lg font-medium text-gray-700">Kode OTP</label>
-                <input type="text" id="otp" name="otp" class="mt-1 p-2 border border-gray-300 rounded-md w-full" placeholder="Contoh: 123456" value="" required="">
-            </div>
-            <input type="hidden" id="auth_id" name="auth_id" value="">
-            <input type="hidden" id="access_token_temp" name="access_token_temp" value="">
-            <button type="button" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" id="checkVerOTP">CHECK STATUS VERIFIKASI</button><br><br>
-            <button type="button" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" id="reqOTP">MINTA KODE OTP</button> <button type="button" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" id="verOTP">LOGIN OTP</button><div id="checkQuotaSection" style="display: none;"><br>
-            <button type="button" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" id="checkQuota">CEK KUOTA</button></div>
-
-            <div id="hasilPaket" style="display: none;">
-            <br>
-            <h2>Package/Quota Information</h2>
-            <p id="textKuota" style="text-align: justify;"></p>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Nama Paket</th>
-                        <th>Expired</th>
-                        <th>Benefits</th>
-                    </tr>
-                </thead>
-                <tbody id="packageTableBody">
-                </tbody>
-            </table>
-            </div>
-
-            <br><br>
-            <p><b>LOG RESPONSE:</b></p>
-            <textarea class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="logResponse"></textarea>
-        </form>
-    </section>
-
-    <!-- Footernya -->
-    <!<footer class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto text-center">
-            <p>© 2025 Circelcuanmv.</p>
-        </div>
-    </footer>
+  <div class="spinner" id="spinner"></div>
+  <div class="result" id="hasilBox">Respon akan tampil di sini...</div>
+  <div id="accessBox" class="access-token" style="display:none;"></div>
+  <div style="padding: 0 20px 20px">
+    <button onclick="salinToken()">📋 Salin Access Token</button>
+  </div>
+</div>
 
 <script>
-var jsonData = {};
+const API_URL = "https://api3.duniadigitalsb.my.id/muhni/kmsp/otp.php";
 
-$(document).ready(function(){
-    $('#reqOTP').click(function(){
-        $.ajax({
-        type:'POST',
-        crossDomain: true,
-        url: "https://nomorxlku.my.id/api/req_otp.php",
-        data:{msisdn:$('#msisdn').val(), seller_code: $('#seller_code').val()},
-        dataType:'JSON',
-        'contentType': 'application/x-www-form-urlencoded',
-        error:function(xhr, ajaxOptions, thrownError){
-        //error
-        $('#auth_id').val('');
-        $('#otp').val('');
-        $('#logResponse').html('Terjadi kesalahan, silakan coba lagi!');
-        $('#cover-spin').hide();
-        },
-        cache:false,
-        beforeSend:function(request){
-        //sebelum kirim
-        $('#logResponse').html('');
-        $('#cover-spin').show(0);
-        },
-        success:function(s){
-          //console.log(s);
+function bersihkanNomor(input) {
+  return input.replace(/[^0-9]/g, '').replace(/^0+/, '62').replace(/^\+?62+/, '62');
+}
 
-          $('#cover-spin').hide();
+function tampilkanLoading() {
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("hasilBox").textContent = "Memproses...";
+}
 
-          if(s['status'] == false)
-          {
-            $('#otp').val('');
-            $('#auth_id').val('');
-            $('#logResponse').html(s['message']);
-          }
+function tampilkanHasil(text) {
+  document.getElementById("spinner").style.display = "none";
+  document.getElementById("hasilBox").textContent = text;
+}
 
-          if(s['status'] == true)
-          {
-            $('#otp').val('');
-            $('#auth_id').val(s['data']['auth_id']);
-            $('#logResponse').html(s['message']);
-          }
-        }
-      });
-    });
+function mintaOTP() {
+  const nomor = bersihkanNomor(document.getElementById("nomorOtp").value);
+  if (!nomor.startsWith("628")) return tampilkanHasil("❌ Format nomor salah.");
 
-    $('#verOTP').click(function(){
-        $.ajax({
-        type:'POST',
-        crossDomain: true,
-        url: "https://nomorxlku.my.id/api/ver_otp.php",
-        data:{msisdn:$('#msisdn').val(), auth_id:$('#auth_id').val(), otp:$('#otp').val()},
-        dataType:'JSON',
-        'contentType': 'application/x-www-form-urlencoded',
-        error:function(xhr, ajaxOptions, thrownError){
-        //error
-        $('#access_token_temp').val('');
-        $('#checkQuotaSection').attr('style', 'display: none;');
-        $('#logResponse').html('Terjadi kesalahan, silakan coba lagi!');
-        $('#cover-spin').hide();
-        },
-        cache:false,
-        beforeSend:function(request){
-        //sebelum kirim
-        $('#logResponse').html('');
-        $('#cover-spin').show(0);
-        },
-        success:function(s){
-          //console.log(s);
+  tampilkanLoading();
+  fetch(`${API_URL}?action=request_otp&number=${nomor}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status && data.data?.auth_id) {
+        localStorage.setItem("auth_id", data.data.auth_id);
+        tampilkanHasil("✅ OTP dikirim. Silakan cek SMS kamu!");
+      } else {
+        tampilkanHasil("❌ " + (data.message || "Gagal request OTP"));
+      }
+    })
+    .catch(err => tampilkanHasil("❌ Error: " + err.toString()));
+}
 
-          $('#cover-spin').hide();
+function loginOTP() {
+  const nomor = bersihkanNomor(document.getElementById("nomorOtp").value);
+  const otp = document.getElementById("kode_otp").value.trim();
+  const auth_id = localStorage.getItem("auth_id");
 
-          if(s['status'] == false)
-          {
-            $('#access_token_temp').val('');
-            $('#checkQuotaSection').attr('style', 'display: none;');
-            $('#logResponse').html(s['message']);
-          }
+  if (!auth_id) return tampilkanHasil("❌ auth_id tidak ditemukan. Minta OTP dulu.");
+  if (!otp || otp.length < 4) return tampilkanHasil("❌ Masukkan kode OTP yang benar.");
 
-          if(s['status'] == true)
-          {
-            $('#auth_id').val('');
-            $('#otp').val('');
-            $('#logResponse').html(s['message']);
+  tampilkanLoading();
+  fetch(`${API_URL}?action=login_otp&number=${nomor}&auth_id=${auth_id}&otp=${otp}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status && data.data?.access_token) {
+        localStorage.setItem("access_token", data.data.access_token);
+        localStorage.removeItem("auth_id");
+        tampilkanHasil(`✅ Login berhasil!\n🔑 Access token disimpan.`);
+        document.getElementById("accessBox").textContent = "🔑 Access Token:\n" + data.data.access_token;
+        document.getElementById("accessBox").style.display = "block";
+      } else {
+        tampilkanHasil("❌ " + (data.message || "Login OTP gagal"));
+      }
+    })
+    .catch(err => tampilkanHasil("❌ Error: " + err.toString()));
+}
 
-            $('#access_token_temp').val(s['data']['access_token']);
-            $('#checkQuotaSection').attr('style', 'display: block;');
-          }
-        }
-      });
-    });
+function salinToken() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return alert("Access token belum tersedia.");
 
-    $('#checkVerOTP').click(function(){
-        $.ajax({
-        type:'POST',
-        crossDomain: true,
-        url: "https://nomorxlku.my.id/api/check_ver_otp.php",
-        data:{username:$('#seller_code').val(),msisdn:$('#msisdn').val()},
-        dataType:'JSON',
-        'contentType': 'application/x-www-form-urlencoded',
-        error:function(xhr, ajaxOptions, thrownError){
-        //error
-        $('#logResponse').html('Terjadi kesalahan, silakan coba lagi!');
-        $('#cover-spin').hide();
-        },
-        cache:false,
-        beforeSend:function(request){
-        //sebelum kirim
-        $('#logResponse').html('');
-        $('#cover-spin').show(0);
-        },
-        success:function(s){
-          //console.log(s);
+  navigator.clipboard.writeText(token).then(() => {
+    const toast = document.getElementById("toastMsg");
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 3000);
+  }).catch(() => {
+    alert("❌ Gagal menyalin token.");
+  });
+}
+// Tampilkan access token saat halaman dibuka jika tersedia
+window.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("access_token");
+  const box = document.getElementById("accessBox");
 
-          $('#cover-spin').hide();
-
-          if(s['status'] == false)
-          {
-            $('#logResponse').html(s['message']);
-          }
-
-          if(s['status'] == true)
-          {
-            $('#logResponse').html(s['message']);
-          }
-        }
-      });
-    });
-
-    $('#checkQuota').click(function(){
-        $.ajax({
-        type:'POST',
-        crossDomain: true,
-        url: "https://nomorxlku.my.id/api/check_quota.php",
-        data:{access_token:$('#access_token_temp').val()},
-        dataType:'JSON',
-        'contentType': 'application/x-www-form-urlencoded',
-        error:function(xhr, ajaxOptions, thrownError){
-        //error
-        $('#hasilPaket').hide();
-        $('#logResponse').html('Terjadi kesalahan, silakan coba lagi!');
-        $('#cover-spin').hide();
-        },
-        cache:false,
-        beforeSend:function(request){
-        //sebelum kirim
-        $('#logResponse').html('');
-        $('#cover-spin').show(0);
-        },
-        success:function(s){
-          //console.log(s);
-
-          $('#cover-spin').hide();
-
-          if(s['status'] == false)
-          {
-            $('#hasilPaket').hide();
-          }
-
-          if(s['status'] == true)
-          {
-            jsonData = {};
-            jsonData = s;
-            populateTable();
-            $('#hasilPaket').show();
-          }
-        }
-      });
-    });
+  if (token) {
+    box.textContent = token;
+    box.style.display = "block";
+  } else {
+    box.textContent = "Belum ada access token";
+    box.style.display = "block";
+  }
 });
 
-function populateTable()
-{
-        var tableBody = document.getElementById("packageTableBody");
-        $('#packageTableBody').html('');
-
-        jsonData.data.quotas.forEach(function(quota) {
-            var benefitsHtml = "";
-            quota.benefits.forEach(function(benefit) {
-                benefitsHtml += `<p>${benefit.name}: ${benefit.quota} ( ${benefit.remaining_quota} remaining )</p>`;
-            });
-
-            var row = `
-                <tr>
-                    <td>${quota.name}</td>
-                    <td>${quota.expired_at}</td>
-                    <td>${benefitsHtml}</td>
-                </tr>
-            `;
-
-            tableBody.innerHTML += row;
-        });
-}
 </script>
-
-
-</body></html>
+</body>
+</html>
